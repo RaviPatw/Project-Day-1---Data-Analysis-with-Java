@@ -1,5 +1,4 @@
 import java.util.*;
-import java.io.*;
 
 public class DataAnalyzer {
     // filtering to return birds that match a specific type
@@ -14,7 +13,7 @@ public class DataAnalyzer {
     }
     // Grouping Method: Groups birds into their bird-type cateogry
     public static HashMap<String, ArrayList<String>> groupByType(ArrayList<String> birds) {
-        String [] types = {"Owl", "Eagle", "Penguin", "Falcon", "Hawk", "Heron", "Sparrow", "Duck", "Crane", "Gull"};
+        String [] types = {"Owl", "Eagle", "Penguin", "Falcon", "Hawk", "Heron", "Sparrow", "Duck", "Crane", "Gull", "Flamingo", "Goose", "Pigeon", "Seagull", "Swallow", "Woodpecker", "Vulture", "Parrot", "Swan", "Turkey"};
         HashMap<String, ArrayList<String>> groups = new HashMap<>();
         for (String type : types) {
             groups.put(type, new ArrayList<>());
@@ -70,27 +69,27 @@ public class DataAnalyzer {
         return -1;
     }
     public static void main(String[] args) {
-        // ArrayList<String> birds = FileOperator.getStringList("names.txt");
-        // ArrayList<String> owls = filterByType(birds, "Owl");
-        // System.out.println("Owls: " + owls);
-        // for (String owl : owls) {
-        //     System.out.println("- "+owl);
-        // }
-        // HashMap<String, ArrayList<String>> groups = groupByType(birds);
-        // System.out.println("\nBird Counts by Type: ");
-        // for (String type : groups.keySet()) {
-        //     System.out.println(type + ": " + groups.get(type).size());
-        // }
-        // System.out.println("\nLargest Group: " + largestGroup(groups));
+        ArrayList<String> birds = FileOperator.getStringList("names.txt");
+        ArrayList<String> owls = filterByType(birds, "Owl");
+        System.out.println("Owls: " + owls);
+        for (String owl : owls) {
+            System.out.println("- "+owl);
+        }
+        HashMap<String, ArrayList<String>> groups = groupByType(birds);
+        System.out.println("\nBird Counts by Type: ");
+        for (String type : groups.keySet()) {
+            System.out.println(type + ": " + groups.get(type).size());
+        }
+        System.out.println("\nLargest Group: " + largestGroup(groups));
         // Calculate time
-        ArrayList<Integer> arr = FileOperator.getIntList("numbers.txt");
-        long startTime = System.nanoTime(); 
-        int result = binarySearch(arr, 10); 
-        long endTime = System.nanoTime(); 
+        // ArrayList<Integer> arr = FileOperator.getIntList("numbers.txt");
+        // long startTime = System.nanoTime(); 
+        // int result = binarySearch(arr, 10); 
+        // long endTime = System.nanoTime(); 
 
-        // Display time in nanoseconds and milliseconds 
-        long duration = endTime - startTime; 
-        System.out.println("Time taken: " + duration + " nanoseconds"); 
-        System.out.println("Time taken: " + (duration / 1000000.0) + " milliseconds");
+        // // Display time in nanoseconds and milliseconds 
+        // long duration = endTime - startTime; 
+        // System.out.println("Time taken: " + duration + " nanoseconds"); 
+        // System.out.println("Time taken: " + (duration / 1000000.0) + " milliseconds");
     }
 }
