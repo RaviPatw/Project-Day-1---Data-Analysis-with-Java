@@ -18,23 +18,33 @@ public class Server {
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         System.out.println("Running at http://localhost:8080");
 
+        DataAnalyzer analyzer = new DataAnalyzer();
+        ArrayList<Bird> birds = analyzer.getBirdData();
+        Bird minBird = analyzer.findMin(birds);
+        Bird maxBird = analyzer.findMax(birds);
+        double avgBird = analyzer.findAvg(birds);
+
+        System.out.println("findMin: " + minBird.getName() + " = " + minBird.getValue());
+        System.out.println("findMax: " + maxBird.getName() + " = " + maxBird.getValue());
+        System.out.println("findAvg: " + String.format("%.2f", avgBird));
+
 
         // Then your handlers become clean one-liners:
         server.createContext("/", new HttpHandler() {
             public void handle(HttpExchange res) throws IOException {
-                serveFile(res, "src/index.html", "text/html");
+                serveFile(res, "index.html", "text/html");
             }
         });
 
         server.createContext("/style.css", new HttpHandler() {
             public void handle(HttpExchange res) throws IOException {
-                serveFile(res, "src/style.css", "text/css");
+                serveFile(res, "style.css", "text/css");
             }
         });
 
         server.createContext("/code.js", new HttpHandler() {
             public void handle(HttpExchange res) throws IOException {
-                serveFile(res, "src/code.js", "application/javascript");
+                serveFile(res, "code.js", "application/javascript");
             }
         });
 
@@ -46,8 +56,9 @@ public class Server {
             exchange.getResponseHeaders().set("Content-Type", "application/json");
 
             // Manually convert ArrayList to JSON array string (no library!)
-            DataAnalyzer analyzer = new DataAnalyzer();
-            String json = analyzer.getCountryInternet().toString();
+            DataAnalyzer requestAnalyzer = new DataAnalyzer();
+            ArrayList<Bird> data = requestAnalyzer.getBirdData();
+            String json = requestAnalyzer.birdsToJson(data);
 
             byte[] response = json.getBytes();
             exchange.sendResponseHeaders(200, response.length);
@@ -61,7 +72,8 @@ public class Server {
             exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
             exchange.getResponseHeaders().set("Content-Type", "application/json");
 
-            String json = new DataAnalyzer().statsToJson( new DataAnalyzer().getCountryInternet());
+            DataAnalyzer analyzer2 = new DataAnalyzer();
+            String json = analyzer2.statsToJson(analyzer2.getBirdData());
             byte[] response = json.getBytes();
             exchange.sendResponseHeaders(200, response.length);
             exchange.getResponseBody().write(response);

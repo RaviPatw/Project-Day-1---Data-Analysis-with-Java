@@ -153,6 +153,104 @@ public class DataAnalyzer {
         return "Report: This bird is usually in a stable category.";
     }
 
+    // Part 2 (web): build chart data from existing bird files.
+    // Each Bird object is: status name + count of birds in that status.
+    public ArrayList<Bird> getBirdData() {
+        if (names.size() == 0 || statuses.size() == 0 || colors.size() == 0 || diets.size() == 0) {
+            loadData();
+        }
+
+        ArrayList<Bird> birdData = new ArrayList<>();
+        if (names.size() == 0 || statuses.size() != names.size() || colors.size() != names.size() || diets.size() != names.size()) {
+            return birdData;
+        }
+
+        ArrayList<String> statusNames = new ArrayList<>();
+        ArrayList<Integer> statusCounts = new ArrayList<>();
+
+        for (int i = 0; i < statuses.size(); i++) {
+            String status = statuses.get(i);
+            int index = statusNames.indexOf(status);
+            if (index == -1) {
+                statusNames.add(status);
+                statusCounts.add(1);
+            } else {
+                statusCounts.set(index, statusCounts.get(index) + 1);
+            }
+        }
+
+        for (int i = 0; i < statusNames.size(); i++) {
+            birdData.add(new Bird(statusNames.get(i), statusCounts.get(i)));
+        }
+
+        return birdData;
+    }
+
+    public String birdsToJson(ArrayList<Bird> birds) {
+        String json = "[";
+        for (int i = 0; i < birds.size(); i++) {
+            json += birds.get(i).toString();
+            if (i < birds.size() - 1) {
+                json += ",";
+            }
+        }
+        json += "]";
+        return json;
+    }
+
+    public Bird findMin(ArrayList<Bird> birds) {
+        if (birds.size() == 0) {
+            return new Bird("None", 0);
+        }
+
+        Bird minBird = birds.get(0);
+        for (int i = 1; i < birds.size(); i++) {
+            if (birds.get(i).getValue() < minBird.getValue()) {
+                minBird = birds.get(i);
+            }
+        }
+        return minBird;
+    }
+
+    public Bird findMax(ArrayList<Bird> birds) {
+        if (birds.size() == 0) {
+            return new Bird("None", 0);
+        }
+
+        Bird maxBird = birds.get(0);
+        for (int i = 1; i < birds.size(); i++) {
+            if (birds.get(i).getValue() > maxBird.getValue()) {
+                maxBird = birds.get(i);
+            }
+        }
+        return maxBird;
+    }
+
+    public double findAvg(ArrayList<Bird> birds) {
+        if (birds.size() == 0) {
+            return 0.0;
+        }
+
+        int sum = 0;
+        for (int i = 0; i < birds.size(); i++) {
+            sum += birds.get(i).getValue();
+        }
+        return sum * 1.0 / birds.size();
+    }
+
+    public String statsToJson(ArrayList<Bird> birds) {
+        Bird min = findMin(birds);
+        Bird max = findMax(birds);
+        double avg = findAvg(birds);
+        return "{\"count\":" + birds.size()
+                + ",\"minName\":\"" + min.getName() + "\""
+                + ",\"minValue\":" + min.getValue()
+                + ",\"maxName\":\"" + max.getName() + "\""
+                + ",\"maxValue\":" + max.getValue()
+                + ",\"avg\":" + String.format("%.2f", avg)
+                + "}";
+    }
+
     private ArrayList<String> readLines(String fileName) throws FileNotFoundException {
         ArrayList<String> rows = new ArrayList<>();
         Scanner scanner = new Scanner(new File(fileName));
