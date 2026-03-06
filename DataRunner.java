@@ -122,11 +122,6 @@ class BirdStudy {
         }
     }
     
-    /**
-     * Method to find birds by specific diet - manipulates array elements
-     * Precondition: Arrays are initialized
-     * Postcondition: Returns birds matching the diet
-     */
     public void findBirdsByDiet(String dietType) {
         System.out.println("\n=== BIRDS WITH " + dietType.toUpperCase() + " DIET ===");
         boolean found = false;
@@ -143,11 +138,7 @@ class BirdStudy {
         }
     }
     
-    /**
-     * toString method providing general information about the dataset
-     * Precondition: Arrays are initialized
-     * Postcondition: Returns string with dataset summary
-     */
+    
     @Override
     public String toString() {
         return "AVIAN VETERINARY STUDY DATASET\n" +
@@ -160,11 +151,7 @@ class BirdStudy {
                "===============================";
     }
     
-    /**
-     * Initialize sample data if files are empty
-     * Precondition: Arrays are empty or null
-     * Postcondition: Arrays contain sample data
-     */
+    
     private void initializeSampleData() {
         System.out.println("Initializing with sample bird data...");
         
@@ -189,12 +176,9 @@ class BirdStudy {
     }
 }
 
-// Note: FileReader class should be provided by your environment
-// If not, you can use this simplified version:
 class FileReader {
     public static String[] toStringArray(String filename) {
-        // Simplified version - returns empty array
-        // In actual assignment, this reads from file
+        
         return new String[0];
     }
     
