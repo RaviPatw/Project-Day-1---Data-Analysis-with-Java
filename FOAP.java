@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-public class FileOperator {
+public class FOAP {
     private static File myFile;
     private static Scanner fileReader;
 

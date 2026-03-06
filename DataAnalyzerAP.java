@@ -1,11 +1,11 @@
 import java.io.*;
 import java.util.*;
 
-public class DataAnalyzer {
+public class DataAnalyzerAP {
     private Map<String, Integer> categoryCounts;
     private Map<String, Integer> dietCounts;
     
-    public DataAnalyzer() {
+    public DataAnalyzerAP() {
         this.categoryCounts = new HashMap<>();
         this.dietCounts = new HashMap<>();
     }
@@ -130,7 +130,7 @@ public class DataAnalyzer {
     }
     
     public static void main(String[] args) {
-        DataAnalyzer analyzer = new DataAnalyzer();
+        DataAnalyzerAP analyzer = new DataAnalyzerAP();
         
         try {
             // Count conservation statuses
