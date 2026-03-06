@@ -270,4 +270,3 @@ svg { width: 100%; display: block; }
     transition: background 0.2s, color 0.2s;
 }
 .btn:hover { background: var(--accent); color: var(--bg); }
-
