@@ -153,8 +153,6 @@ public class DataAnalyzer {
         return "Report: This bird is usually in a stable category.";
     }
 
-    // Part 2 (web): build chart data from existing bird files.
-    // Each Bird object is: status name + count of birds in that status.
     public ArrayList<Bird> getBirdData() {
         if (names.size() == 0 || statuses.size() == 0 || colors.size() == 0 || diets.size() == 0) {
             loadData();
