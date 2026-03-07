@@ -15,12 +15,11 @@ public class Server {
         res.getResponseBody().write(bytes);
         res.getResponseBody().close();
     }
+
     public static void main(String[] args) throws Exception {
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         System.out.println("Running at http://localhost:8080");
 
-
-        // Then your handlers become clean one-liners:
         server.createContext("/", new HttpHandler() {
             public void handle(HttpExchange res) throws IOException {
                 serveFile(res, "index.html", "text/html");
@@ -39,27 +38,33 @@ public class Server {
             }
         });
 
-
-        // Serve ArrayList as JSON
+        // Returns all bird groups and their counts as a JSON array
+        // e.g. [{"name":"Owl","value":3},{"name":"Eagle","value":2},...]
         server.createContext("/data", exchange -> {
-            // Add CORS header so browser fetch() works
             exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
             exchange.getResponseHeaders().set("Content-Type", "application/json");
 
-            // Manually convert ArrayList to JSON array string (no library!)
             DataAnalyzer analyzer = new DataAnalyzer();
             ArrayList<String> birds = FileOperator.getStringList("names.txt");
             HashMap<String, ArrayList<String>> groups = analyzer.groupByType(birds);
-            String largest = analyzer.largestGroup(groups);
-            String json = "{\"largestGroup\":\"" + largest + "\"}";
-            byte[] response = json.getBytes();
+
+            StringBuilder json = new StringBuilder("[");
+            boolean first = true;
+            for (String type : groups.keySet()) {
+                int count = groups.get(type).size();
+                if (count == 0) continue; // skip empty groups
+                if (!first) json.append(",");
+                json.append("{\"name\":\"").append(type).append("\",\"value\":").append(count).append("}");
+                first = false;
+            }
+            json.append("]");
+
+            byte[] response = json.toString().getBytes();
             exchange.sendResponseHeaders(200, response.length);
             exchange.getResponseBody().write(response);
             exchange.getResponseBody().close();
-
-
         });
-        
+
         server.createContext("/stats", exchange -> {
             exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
             exchange.getResponseHeaders().set("Content-Type", "application/json");
@@ -74,8 +79,6 @@ public class Server {
             exchange.getResponseBody().close();
         });
 
-
         server.start();
-
     }
 }
