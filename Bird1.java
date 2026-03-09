@@ -1,9 +1,9 @@
-public class Bird {
+public class Bird1 {
     private String name;
     private String diet;
     private String conservationStatus;
-    
-    public Bird(String name, String diet, String conservationStatus) {
+
+    public Bird1(String name, String diet, String conservationStatus) {
         this.name = name;
         this.diet = diet;
         this.conservationStatus = conservationStatus;
@@ -18,10 +18,10 @@ public class Bird {
         return conservationStatus;
     }
 
-    public String setDiet(String d){
+    public void setDiet(String d){
         diet=d;
     }
-    
+
     public boolean isCarnivore() {
         return diet.toLowerCase().contains("carnivore");
     }
@@ -40,7 +40,7 @@ public class Bird {
     public boolean isLeastConcern() {
         return conservationStatus.equals("Least Concern");
     }
-    
+
     @Override
     public String toString() {
         return name + " - Diet: " + diet + ", Status: " + conservationStatus;
