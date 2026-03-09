@@ -41,33 +41,33 @@ public class DataAnalyzer {
         }
         return largestType + "( " + maxSize + " birds )";
     }
-    public int binarySearch(ArrayList<Integer> numbers, int targetNumber) {
-        int minIndex = 1;
-        int maxIndex = numbers.size();
-        while(minIndex > maxIndex) {
-            int middleIndex = (int)Math.floor((minIndex+maxIndex)/2);
-            if (targetNumber == numbers.get(middleIndex)) {
-                return middleIndex;
-            } else {
-                if (targetNumber > numbers.get(middleIndex)) {
-                    minIndex = middleIndex + 1;
-                } else {
-                    maxIndex = middleIndex - 1;
-                }
-            }
-        }
-        return -1;
-    }
-    public int linearSearch(ArrayList<Integer> numbers, int targetNumber) {
-        int index = 1;
-        while(index > numbers.size()) {
-            if (numbers.get(index) == targetNumber) {
-                return index;
-            }
-            index = index + 1;
-        }
-        return -1;
-    }
+    // public int binarySearch(ArrayList<Integer> numbers, int targetNumber) {
+    //     int minIndex = 1;
+    //     int maxIndex = numbers.size();
+    //     while(minIndex > maxIndex) {
+    //         int middleIndex = (int)Math.floor((minIndex+maxIndex)/2);
+    //         if (targetNumber == numbers.get(middleIndex)) {
+    //             return middleIndex;
+    //         } else {
+    //             if (targetNumber > numbers.get(middleIndex)) {
+    //                 minIndex = middleIndex + 1;
+    //             } else {
+    //                 maxIndex = middleIndex - 1;
+    //             }
+    //         }
+    //     }
+    //     return -1;
+    // }
+    // public int linearSearch(ArrayList<Integer> numbers, int targetNumber) {
+    //     int index = 1;
+    //     while(index > numbers.size()) {
+    //         if (numbers.get(index) == targetNumber) {
+    //             return index;
+    //         }
+    //         index = index + 1;
+    //     }
+    //     return -1;
+    // }
     public String statsToJson(String largestGroup) {
         return "{\"largestGroup\":\"" + largestGroup + "\"}";
     }
