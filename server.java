@@ -3,6 +3,7 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Server {
 
@@ -17,16 +18,6 @@ public class Server {
     public static void main(String[] args) throws Exception {
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         System.out.println("Running at http://localhost:8080");
-
-        DataAnalyzer analyzer = new DataAnalyzer();
-        ArrayList<Bird> birds = analyzer.getBirdData();
-        Bird minBird = analyzer.findMin(birds);
-        Bird maxBird = analyzer.findMax(birds);
-        double avgBird = analyzer.findAvg(birds);
-
-        System.out.println("findMin: " + minBird.getName() + " = " + minBird.getValue());
-        System.out.println("findMax: " + maxBird.getName() + " = " + maxBird.getValue());
-        System.out.println("findAvg: " + String.format("%.2f", avgBird));
 
 
         // Then your handlers become clean one-liners:
@@ -56,10 +47,11 @@ public class Server {
             exchange.getResponseHeaders().set("Content-Type", "application/json");
 
             // Manually convert ArrayList to JSON array string (no library!)
-            DataAnalyzer requestAnalyzer = new DataAnalyzer();
-            ArrayList<Bird> data = requestAnalyzer.getBirdData();
-            String json = requestAnalyzer.birdsToJson(data);
-
+            DataAnalyzer analyzer = new DataAnalyzer();
+            ArrayList<String> birds = FileOperator.getStringList("names.txt");
+            HashMap<String, ArrayList<String>> groups = analyzer.groupByType(birds);
+            String largest = analyzer.largestGroup(groups);
+            String json = "{\"largestGroup\":\"" + largest + "\"}";
             byte[] response = json.getBytes();
             exchange.sendResponseHeaders(200, response.length);
             exchange.getResponseBody().write(response);
@@ -71,9 +63,11 @@ public class Server {
         server.createContext("/stats", exchange -> {
             exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
             exchange.getResponseHeaders().set("Content-Type", "application/json");
-
-            DataAnalyzer analyzer2 = new DataAnalyzer();
-            String json = analyzer2.statsToJson(analyzer2.getBirdData());
+            DataAnalyzer analyzer = new DataAnalyzer();
+            ArrayList<String> birds = FileOperator.getStringList("names.txt");
+            HashMap<String, ArrayList<String>> groups = analyzer.groupByType(birds);
+            String largest = analyzer.largestGroup(groups);
+            String json = analyzer.statsToJson(largest);
             byte[] response = json.getBytes();
             exchange.sendResponseHeaders(200, response.length);
             exchange.getResponseBody().write(response);
