@@ -11,10 +11,10 @@ public class Search {
             int mid = (int)Math.floor((low + high)/ 2);
             if (arr.get(mid) == target) {
                 return mid;
-            } 
+            }
             else if (arr.get(mid) < target) {
                 low = mid + 1;
-            } 
+            }
             else {
                 high = mid - 1;
             }
@@ -29,7 +29,6 @@ public class Search {
         }
         return -1;
     }
-
 
     public static void main(String[] args) throws FileNotFoundException  {
 

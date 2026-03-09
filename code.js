@@ -13,87 +13,119 @@ const COLORS = [
 ];
 
 // ========================
-// Fetch data from Java server
-// Falls back to demo data if server not running
+// Demo data (used if Java server is not running)
+// ========================
+const DEMO_BIRDS = [
+    {name:'Owl',value:8},{name:'Eagle',value:5},{name:'Hawk',value:6},
+    {name:'Falcon',value:4},{name:'Heron',value:3},{name:'Sparrow',value:7},
+    {name:'Duck',value:5},{name:'Penguin',value:2}
+];
+const DEMO_STATUS = [
+    {name:'Critically Endangered',value:1},{name:'Endangered',value:4},
+    {name:'Vulnerable',value:6},{name:'Near Threatened',value:8},{name:'Least Concern',value:22}
+];
+const DEMO_DIET = [
+    {name:'fish',value:12},{name:'seeds',value:8},{name:'insects',value:7},
+    {name:'frogs',value:5},{name:'squid',value:4},{name:'berries',value:3}
+];
+
+// ========================
+// Fetch all data from Java server
 // ========================
 async function loadData() {
-    const barDiv = document.getElementById('barChart');
-    barDiv.innerHTML = '<p class="status">Fetching from Java server...</p>';
+    setLoading('barChart');
+    setLoading('statusChart');
+    setLoading('dietChart');
     document.getElementById('lineCard').style.display = 'none';
     document.getElementById('statsRow').style.display = 'none';
 
-    let countries;
+    let birds, status, diet, statsData;
 
     try {
-        const res = await fetch('http://localhost:8080/data');
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        countries = await res.json();
+        const [bRes, sRes, dRes, stRes] = await Promise.all([
+            fetch('http://localhost:8080/data'),
+            fetch('http://localhost:8080/status'),
+            fetch('http://localhost:8080/diet'),
+            fetch('http://localhost:8080/stats'),
+        ]);
+        if (!bRes.ok) throw new Error('HTTP ' + bRes.status);
+        [birds, status, diet, statsData] = await Promise.all([
+            bRes.json(), sRes.json(), dRes.json(), stRes.json()
+        ]);
     } catch (e) {
-
-        barDiv.innerHTML = `<p class="status error">&#9888; Could not reach Java server &mdash; showing demo data</p>`;
+        document.getElementById('barChart').innerHTML =
+            `<p class="status error">&#9888; Could not reach Java server &mdash; showing demo data</p>`;
         await new Promise(r => setTimeout(r, 700));
+        birds     = DEMO_BIRDS;
+        status    = DEMO_STATUS;
+        diet      = DEMO_DIET;
+        statsData = { largestGroup: 'Owl( 8 birds )' };
     }
 
-    renderBarChart(countries);
-    renderLineChart(countries);
-    renderStats(countries);
+    renderBarChart('barChart',    birds);
+    renderLineChart(birds);
+    renderBarChart('statusChart', status);
+    renderBarChart('dietChart',   diet);
+    renderStats(birds, status, diet, statsData);
+}
+
+function setLoading(id) {
+    document.getElementById(id).innerHTML = '<p class="status">Fetching from Java server...</p>';
 }
 
 // ========================
-// Bar Chart
+// Bar Chart (reusable — pass container ID + data)
 // ========================
-function renderBarChart(countries) {
-    const max        = Math.max(...countries.map(c => c.value));
+function renderBarChart(containerId, data) {
+    const max        = Math.max(...data.map(d => d.value));
     const GRID_STEPS = 5;
-    const stepVal    = Math.ceil(max / GRID_STEPS);
+    const stepVal    = Math.ceil(max / GRID_STEPS) || 1;
     const chartMax   = stepVal * GRID_STEPS;
 
-    // Gridlines
     let gridHTML = '<div class="gridlines">';
     for (let i = GRID_STEPS; i >= 0; i--) {
         gridHTML += `<div class="gridline"><span>${i * stepVal}</span></div>`;
     }
     gridHTML += '</div>';
 
-    // Bars with country name labels
     let barsHTML = '';
-    countries.forEach((c, i) => {
-        const pct   = (c.value / chartMax) * 100;
+    data.forEach((d, i) => {
+        const pct   = (d.value / chartMax) * 100;
         const delay = (i * 0.07).toFixed(2);
         barsHTML += `
       <div class="bar-group">
         <div class="bar"
-          data-value="${c.value}%"
+          data-value="${d.value}"
           style="height:${pct}%;background:${COLORS[i % COLORS.length]};animation-delay:${delay}s">
         </div>
-        <div class="bar-label">${c.name}</div>
+        <div class="bar-label">${d.name}</div>
       </div>`;
     });
 
-    document.getElementById('barChart').innerHTML = `
+    document.getElementById(containerId).innerHTML = `
     <div class="chart-area">${gridHTML}${barsHTML}</div>
     <div class="x-axis"></div>
   `;
 }
 
 // ========================
-// Line Chart (SVG)
+// Line Chart (SVG) — bird type groups
 // ========================
-function renderLineChart(countries) {
+function renderLineChart(data) {
     document.getElementById('lineCard').style.display = 'block';
     const svg   = document.getElementById('lineChart');
     const W     = 760, H = 200, PAD = 20;
-    const max   = Math.max(...countries.map(c => c.value)) * 1.1;
-    const count = countries.length;
+    const max   = Math.max(...data.map(d => d.value)) * 1.1;
+    const count = data.length;
 
-    const xs = countries.map((_, i) => PAD + (i / (count - 1)) * (W - PAD * 2));
-    const ys = countries.map(c => H - PAD - (c.value / max) * (H - PAD * 2));
+    const xs = data.map((_, i) => PAD + (i / (count - 1)) * (W - PAD * 2));
+    const ys = data.map(d => H - PAD - (d.value / max) * (H - PAD * 2));
 
     const pathD = xs.map((x, i) => `${i === 0 ? 'M' : 'L'} ${x} ${ys[i]}`).join(' ');
     const areaD = pathD + ` L ${xs[count - 1]} ${H} L ${xs[0]} ${H} Z`;
 
-    const dots = countries.map((c, i) =>
-        `<circle class="dot" cx="${xs[i]}" cy="${ys[i]}" r="5"><title>${c.name}: ${c.value}%</title></circle>`
+    const dots = data.map((d, i) =>
+        `<circle class="dot" cx="${xs[i]}" cy="${ys[i]}" r="5"><title>${d.name}: ${d.value}</title></circle>`
     ).join('');
 
     svg.innerHTML = `
@@ -110,26 +142,28 @@ function renderLineChart(countries) {
 }
 
 // ========================
-// Stats Row
+// Stats Row — summary across all datasets
 // ========================
-function renderStats(countries) {
-    const values = countries.map(c => c.value);
-    const sum    = values.reduce((a, b) => a + b, 0);
-    const avg    = (sum / values.length).toFixed(1);
-    const max    = Math.max(...values);
-    const min    = Math.min(...values);
+function renderStats(birds, status, diet, statsData) {
+    const totalBirds = birds.reduce((a, b) => a + b.value, 0);
 
-    // Find country names for min and max
-    const maxCountry = countries.find(c => c.value === max).name;
-    const minCountry = countries.find(c => c.value === min).name;
+    const endangered = (status.find(s => s.name === 'Endangered') || {value: 0}).value;
+    const critical   = (status.find(s => s.name === 'Critically Endangered') || {value: 0}).value;
+    const leastConcern = (status.find(s => s.name === 'Least Concern') || {value: 0}).value;
+
+    const topDiet = diet.length
+        ? diet.reduce((a, b) => a.value > b.value ? a : b)
+        : {name: '-', value: 0};
+
+    const largestGroup = statsData.largestGroup || '-';
 
     const items = [
-        { label: 'Count',    value: countries.length,          color: '#00ffe0' },
-        { label: 'Lowest',   value: `${min}% (${minCountry})`, color: '#60a5fa' },
-        { label: 'Highest',  value: `${max}% (${maxCountry})`, color: '#ff3f6c' },
-        { label: 'Average',  value: avg + '%',                 color: '#ffe040' },
-        { label: 'Range',    value: (max - min).toFixed(1)+'%',color: '#a78bfa' },
-        { label: 'Sum',      value: sum.toFixed(1) + '%',      color: '#34d399' },
+        { label: 'Total Birds',        value: totalBirds,            color: '#00ffe0' },
+        { label: 'Largest Type Group', value: largestGroup,          color: '#ff3f6c' },
+        { label: 'Endangered',         value: endangered + critical, color: '#ffe040' },
+        { label: 'Least Concern',      value: leastConcern,          color: '#34d399' },
+        { label: 'Top Diet',           value: topDiet.name,          color: '#a78bfa' },
+        { label: 'Diet Varieties',     value: diet.length,           color: '#60a5fa' },
     ];
 
     document.getElementById('stats').innerHTML = items.map(s => `

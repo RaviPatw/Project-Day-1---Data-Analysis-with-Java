@@ -1,4 +1,3 @@
-// Country.java
 public class Country {
     private String name;
     private double internetUsage;

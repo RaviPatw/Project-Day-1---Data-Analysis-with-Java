@@ -29,7 +29,7 @@ public class Bird {
         this.color = color;
     }
     public String toString() {
-        return "{\"name\":\"" + name + "\",\"diet\":\"" + diet + "\",\"status\":\"" + status + "\",\"color\":\"" + color + "\"}"; 
+        return "{\"name\":\"" + name + "\",\"diet\":\"" + diet + "\",\"status\":\"" + status + "\",\"color\":\"" + color + "\"}";
     }
     public static void main(String[] args) {
         Bird bird1 = new Bird();
