@@ -63,7 +63,6 @@ async function loadData() {
     }
 
     renderBarChart('barChart',    birds);
-    renderLineChart(birds);
     renderBarChart('statusChart', status);
     renderBarChart('dietChart',   diet);
     renderStats(birds, status, diet, statsData);

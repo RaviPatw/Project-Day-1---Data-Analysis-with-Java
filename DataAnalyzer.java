@@ -56,7 +56,14 @@ public class DataAnalyzer {
                 }
             }
         }
-        return groups;
+
+        //Collection to sort
+        LinkedHashMap<String, ArrayList<String>> sortedGroups = new LinkedHashMap<>();
+        groups.entrySet()
+                .stream()
+                .sorted((a,b) -> b.getValue().size() - a.getValue().size())
+                .forEach(entry -> sortedGroups.put(entry.getKey(), entry.getValue()));
+        return sortedGroups;
     }
     public String largestGroup(HashMap<String, ArrayList<String>> groups) {
         String largestType = "";
